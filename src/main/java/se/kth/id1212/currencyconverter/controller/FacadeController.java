@@ -5,6 +5,7 @@
  */
 package se.kth.id1212.currencyconverter.controller;
 
+import java.io.IOException;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -13,6 +14,7 @@ import javax.ejb.TransactionAttributeType;
 import se.kth.id1212.currencyconverter.integration.ConverterDAO;
 import se.kth.id1212.currencyconverter.integration.EntityManagerException;
 import se.kth.id1212.currencyconverter.model.Currency;
+import se.kth.id1212.currencyconverter.model.JSONHandler;
 import se.kth.id1212.currencyconverter.model.Rates;
 
 /**
@@ -27,16 +29,23 @@ public class FacadeController {
     @EJB
     ConverterDAO converterDAO;
     
+    JSONHandler json;
+    
     public List<Currency> getAllCurrencies() throws EntityManagerException  {
         return converterDAO.getAllCurrencies();
     }
     
-    public double convert(long baseID, long nameID, double amount) throws EntityManagerException {
-        Currency base = converterDAO.findCurrency(baseID);
-        Currency to = converterDAO.findCurrency(nameID);
-        Rates rate = converterDAO.getConversionRate(base, to);
+    public double convert(long fromID, long toID, double amount) throws EntityManagerException {
+        Currency from = converterDAO.findCurrency(fromID);
+        Currency to = converterDAO.findCurrency(toID);
+        Rates rate = converterDAO.getConversionRate(from, to);
         
         return rate.getRate() * amount;
+    }
+
+    public void updateRates() throws UnsupportedOperationException, IOException {
+	json = new JSONHandler();
+	json.getCurrencyUpdate("USD");
     }
     
 }

@@ -26,11 +26,12 @@ public class Currency implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
     
     @Column(unique = true, nullable = false)
-    private String name;
+    private String longName;
     @Column(unique = true, nullable = false)
-    private String abbr;
+    private String shortName;
     
     @OneToMany(mappedBy = "baseCurrency", cascade = CascadeType.ALL)
     private Collection<Rates> rates = new ArrayList<>();
@@ -38,18 +39,36 @@ public class Currency implements Serializable {
     public Currency() {
     }
     
-    public Currency(String name, String abbr) {
-        this.name = name;
-        this.abbr = abbr.toUpperCase();
+    public Currency(String longName, String shortName) {
+        this.longName = longName;
+        this.shortName = shortName.toUpperCase();
     }
     
-    public String getName() {
-        return name;
+    public long getId() {
+        return id;
+    }
+    
+    public void setId(long id) {
+        this.id = id;
+    }
+    
+    public String getLongName() {
+        return longName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setLongName(String longName) {
+        this.longName = longName;
     }
+    
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName.toUpperCase();
+    }
+    
+    
     
     public Collection<Rates> getRates() {
         return rates;
@@ -58,13 +77,11 @@ public class Currency implements Serializable {
     public void setRates(Collection<Rates> rates) {
         this.rates = rates;
     }
-    
-    
-
+ 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (name != null ? name.hashCode() : 0);
+        hash += (shortName != null ? shortName.hashCode() : 0);
         return hash;
     }
 
@@ -75,7 +92,7 @@ public class Currency implements Serializable {
             return false;
         }
         Currency other = (Currency) object;
-        if ((this.name == null && other.name != null) || (this.name != null && !this.name.equals(other.name))) {
+        if ((this.shortName == null && other.shortName != null) || (this.shortName != null && !this.shortName.equals(other.shortName))) {
             return false;
         }
         return true;
@@ -83,7 +100,7 @@ public class Currency implements Serializable {
 
     @Override
     public String toString() {
-        return abbr + " - " + name;
+        return shortName + " - " + longName;
     }
     
 }

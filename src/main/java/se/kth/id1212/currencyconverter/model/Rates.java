@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -23,7 +24,7 @@ import javax.persistence.NamedQuery;
 @NamedQueries({
     @NamedQuery(
         name = "getConversionRate",
-        query = "SELECT rate FROM Rates rate WHERE rate.baseCurrency=:baseCurrency AND rate.name=:name"
+        query = "SELECT rate FROM Rates rate WHERE rate.baseCurrency=:baseCurrency AND rate.toCurrency=:toCurrency"
     )
 })
 
@@ -35,9 +36,9 @@ public class Rates implements Serializable {
     private long id;
     
     @ManyToOne(optional = false)
-    private String baseCurrency;
-    @Column(nullable = false)
-    private String name;
+    private Currency baseCurrency;
+    @JoinColumn(nullable = false)
+    private Currency toCurrency;
     @Column(nullable = false)
     private double rate;
     
@@ -45,18 +46,14 @@ public class Rates implements Serializable {
         
     }
     
-    public Rates(String baseCurrency, String name, double rate) {
+    public Rates(Currency baseCurrency, Currency toCurrency, double rate) {
         this.baseCurrency = baseCurrency;
-        this.name = name;
+        this.toCurrency = toCurrency;
         this.rate = rate;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public long getId() {
+        return id;
     }
     
     public double getRate() {
@@ -70,7 +67,7 @@ public class Rates implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (name != null ? name.hashCode() : 0);
+        hash += (baseCurrency != null ? baseCurrency.hashCode() : 0);
         return hash;
     }
 
@@ -81,7 +78,7 @@ public class Rates implements Serializable {
             return false;
         }
         Rates other = (Rates) object;
-        if ((this.name == null && other.name != null) || (this.name != null && !this.name.equals(other.name))) {
+        if ((this.baseCurrency == null && other.baseCurrency != null) || (this.baseCurrency != null && !this.baseCurrency.equals(other.baseCurrency))) {
             return false;
         }
         return true;
@@ -89,7 +86,7 @@ public class Rates implements Serializable {
 
     @Override
     public String toString() {
-        return "["+ name + " - " + rate + "]";
+        return "["+ toCurrency + " - " + rate + "]";
     }
     
 }

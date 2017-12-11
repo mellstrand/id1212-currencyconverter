@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Currency Converter</title>
+    </h:head>
+    <h:body>
+        <h1>Currency Converter</h1>
+        
+        <h2>From:</h2>
+        <h:selectOneMenu>
+            <f:selectItems value="#{converterManager.allCurrencies}"
+                           itemLabel="#{currency.shortName}" />   
+        </h:selectOneMenu>
+        
+        <h2>To:</h2>
+        <h:selectOneMenu>
+            
+            
+        </h:selectOneMenu>
+        
+        <h2>Amount:</h2>
+        <h:inputText></h:inputText>
+        <h:commandButton value="Convert" action="#{converterManager.convert()}"/>
+        
+        
+        
+        <h2>Update Currency Rates</h2>
+        <h:form>
+            <h:commandButton value="Update Rates" action="#{converterManager.updateRates()}"/>
+        </h:form>
+    
+    </h:body>
+</html>
