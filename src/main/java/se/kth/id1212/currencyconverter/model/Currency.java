@@ -31,6 +31,7 @@ import javax.persistence.NamedQuery;
  * Entity class for Currency
  * Holds two string, a short and a long representation of a currency
  * Example: USD - US-dollar
+ * Getters and Setters for each variable
  */
 @Entity(name = "Currency")
 public class Currency implements Serializable {

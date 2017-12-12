@@ -41,17 +41,15 @@ public class JSONHandler {
      */
     public Set<Map.Entry<String, JsonElement>> getCurrencyUpdate(String base) throws MalformedURLException, IOException {
 	
-	URL url;
-	String u = urlBase.concat(base);
-	url = new URL(u);
-	HttpURLConnection request = (HttpURLConnection) url.openConnection();
+	String urlComplete = urlBase.concat(base);
+	URL requestURL = new URL(urlComplete);
+	HttpURLConnection request = (HttpURLConnection) requestURL.openConnection();
 	request.connect();
-	
-	JsonParser jp = new JsonParser();
-	JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent()));
-	JsonObject rootObject = root.getAsJsonObject();
-	JsonElement rates = rootObject.get("rates");
-	JsonObject ratesObject = rates.getAsJsonObject();
+	JsonParser parser = new JsonParser();
+	JsonElement rootElement = parser.parse(new InputStreamReader((InputStream) request.getContent()));
+	JsonObject rootObject = rootElement.getAsJsonObject();
+	JsonElement ratesElement = rootObject.get("rates");
+	JsonObject ratesObject = ratesElement.getAsJsonObject();
 	
 	return ratesObject.entrySet();
     }

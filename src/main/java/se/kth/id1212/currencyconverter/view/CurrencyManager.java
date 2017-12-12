@@ -1,27 +1,25 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package se.kth.id1212.currencyconverter.view;
-
-import java.io.Serializable;
-import javax.ejb.EJB;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Named;
-import se.kth.id1212.currencyconverter.controller.FacadeController;
-
 /**
  *
  * @author mellstrand
  * @date 2017-12-08
  */
+
+package se.kth.id1212.currencyconverter.view;
+
+import java.io.Serializable;
+import javax.ejb.EJB;
+import javax.enterprise.context.SessionScoped;
+import javax.inject.Named;
+import se.kth.id1212.currencyconverter.controller.FacadeController;
+
+/**
+ * Bean for the 'Dev Section' on the web page 
+ */
 @Named("currencyManager")
-@RequestScoped
+@SessionScoped
 public class CurrencyManager implements Serializable {
     
-    @EJB
-    private FacadeController fc;
+    @EJB private FacadeController fc;
     private String shortName;
     private long fromId;
     private long toId;
@@ -51,6 +49,10 @@ public class CurrencyManager implements Serializable {
 	this.toId = toId;
     }
 
+    /**
+     * Add currency button
+     * Calls the controller to add the requested currency to the db
+     */
     public void addCurrency() {
 	exception = null;
 	try {
@@ -60,6 +62,10 @@ public class CurrencyManager implements Serializable {
 	}
     }
     
+    /**
+     * Add Rate binding button
+     * Calls controller to add a binding between the two currencies
+     */
     public void addRatesBinding() {
 	exception = null;
 	try {
@@ -69,24 +75,26 @@ public class CurrencyManager implements Serializable {
 	}
     }
     
-    public void updateRates() {
-	exception = null;
-	try {
-	    fc.updateRates();
-	} catch (Exception e) {
-	    handleException(e);
-	}
-    }
-    
+    /**
+     * Print and set an exception 
+     */
     private void handleException(Exception e) {
 	e.printStackTrace(System.err);
 	exception = e;
     }
     
+    /**
+     * Enables 'errorCurrancy.xhtml' to retrieve exception for display 
+     * @return 
+     */
     public Exception getException() {
         return exception;
     }
     
+    /**
+     * For 'faces-config.xml' to see if any exceptions has occurred 
+     * @return 
+     */
     public boolean getSuccess() {
 	return exception == null;
     }

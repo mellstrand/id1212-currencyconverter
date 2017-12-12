@@ -1,8 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ *
+ * @author mellstrand
+ * @date 2017-12-06
  */
+
 package se.kth.id1212.currencyconverter.controller;
 
 import com.google.gson.JsonElement;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -22,31 +24,53 @@ import se.kth.id1212.currencyconverter.model.JSONHandler;
 import se.kth.id1212.currencyconverter.model.Rates;
 
 /**
- *
- * @author mellstrand
- * @date 2017-12-06
+ * Handles requests from client (view)
  */
-
 @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 @Stateless
 public class FacadeController {
     
-    @EJB
-    ConverterDAO converterDAO;
+    @EJB ConverterDAO converterDAO;
     private JSONHandler json;
-    private final HashMap<String,String> ratesList = new HashMap<>();
-    private boolean init = false;
+    private final HashMap<String,String> currencyList = new HashMap<>();
    
+    /**
+     * A PostConstruct method to init the HashMap of currencies
+     */
+    @PostConstruct
+    public void init() {
+	initCurrencyList();
+    }
     
+    /**
+     * Get all currencies in Currency Table
+     * @return List of Currencies
+     * @throws EntityManagerException 
+     */
     public List<Currency> getAllCurrencies() throws EntityManagerException  {
         return converterDAO.getAllCurrencies();
     }
     
+    /**
+     * Get related currencies to a base currency, i.e. currencies it has rates
+     * connections to
+     * @param currency Base currency
+     * @return List of Rates
+     * @throws EntityManagerException 
+     */
     public List<Rates> getRelatedCurrencies(Currency currency) throws EntityManagerException  {
         System.out.println("DEBUG: getRelatedCurrencies(): " + currency);
 	return converterDAO.getRelatedCurrencies(currency);
     }
     
+    /**
+     * Convert from one currency to another currency
+     * @param fromID From currency's id in db table
+     * @param toID To currency's id in db table
+     * @param amount Amount to convert
+     * @return Converted amount
+     * @throws EntityManagerException 
+     */
     public double convert(long fromID, long toID, double amount) throws EntityManagerException {
         Currency from = converterDAO.findCurrency(fromID);
         Currency to = converterDAO.findCurrency(toID);
@@ -55,14 +79,14 @@ public class FacadeController {
         return rate.getRate() * amount;
     }
    
-    public Currency getCurrency(long fromId) throws EntityManagerException {
-	System.out.println("DEBIG: getCurrency: " + fromId);
-	return converterDAO.findCurrency(fromId);
-    }
-    
-    
-    
-    public void updateRates() throws IOException, EntityManagerException {
+    /**
+     * Get new rates for each currency to their related currencies
+     * Fetched from API, more info in model/JSONHandler.java
+     * @throws IOException
+     * @throws EntityManagerException
+     * @throws Exception 
+     */
+    public void updateRates() throws IOException, EntityManagerException, Exception {
 	List<Currency> currencies = getAllCurrencies();
 	json = new JSONHandler();
 	
@@ -78,25 +102,55 @@ public class FacadeController {
 		for (Map.Entry<String,JsonElement> temp : entry) {
 		    if(temp.getKey().equals(toCurrencyShortName)) {
 			System.out.println("DEBUG updateRates(): " + baseCurrency + " - " + toCurrency + " - " + temp.getValue());
-			converterDAO.updateConversionRate(baseCurrency, toCurrency, temp.getValue().getAsDouble());
+			updateConversionRate(baseCurrency, toCurrency, temp.getValue().getAsDouble());
 		    }
 		}
 	    }
 	}	
     }
     
+    /**
+     * Adds a connection between two currencies
+     * @param fromId Currency to convert from
+     * @param toId Currency to convert to
+     * @throws EntityManagerException 
+     */
     public void addRatesBinding(long fromId, long toId) throws EntityManagerException {
 	Currency from = converterDAO.findCurrency(fromId);
 	Currency to = converterDAO.findCurrency(toId);
-	converterDAO.addRatesBindingToDataBase(from, to);
+	converterDAO.addRatesBindingToDatabase(from, to);
     }
     
-    public void addCurrency(String shortName) throws EntityManagerException, Exception {
-	if(!init) {
-	    initRatesList();
+    /**
+     * Update the rate between two currencies. If none in table, create the Rates object
+     * Else update the rate for the searched currencies
+     * @param baseCurrency From currency
+     * @param toCurrency To currency
+     * @param value Conversion rate
+     * @throws Exception 
+     */
+    public void updateConversionRate(Currency baseCurrency, Currency toCurrency, double value) throws Exception {
+	Rates rate = converterDAO.ratesExists(baseCurrency, toCurrency);
+	if(rate == null) {
+	    converterDAO.addRatesToDatabase(baseCurrency, toCurrency, value);
+	} else {
+	    try {
+		rate.setRate(value);
+	    } catch(Exception e) {
+		throw new Exception("Could not update rate...");
+	    }
 	}
 	
-    	String longName = ratesList.get(shortName.toUpperCase());
+    }
+    
+    /**
+     * Add currency to database table Currency
+     * @param shortName Three letter name for the currency
+     * @throws EntityManagerException
+     * @throws Exception 
+     */
+    public void addCurrency(String shortName) throws EntityManagerException, Exception {
+	String longName = currencyList.get(shortName.toUpperCase());
 	if(longName == null) {
 	    throw new Exception("Currency not in list...");
 	}
@@ -104,40 +158,54 @@ public class FacadeController {
 	converterDAO.addCurrencyToDataBase(new Currency(shortName, longName));
 	 
     }
-
-    private void initRatesList() {
-	ratesList.put("AUD", "Australinsk Dollar");
-	ratesList.put("BGN", "Bulgarisk Ny Lev");
-	ratesList.put("BRL", "Brasiliansk Real");
-	ratesList.put("CAD", "Kanadensisk Dollar");
-	ratesList.put("CHF", "Schweizisk Franc");
-	ratesList.put("CNY", "Kinesisk Yuan Renminbi");
-	ratesList.put("CZK", "Tjeckisk Koruna");
-	ratesList.put("DKK", "Dansk Krona");
-	ratesList.put("EUR", "Euro");
-	ratesList.put("GBP", "Brittisk Pund Sterling");
-	ratesList.put("HKD", "Hongkong-dollar");
-	ratesList.put("HRK", "Kroatisk Kuna");
-	ratesList.put("HUF", "Ungersk Forint");
-	ratesList.put("IDR", "Indonesisk Rupiah");
-	ratesList.put("ILS", "Israelisk Ny Shekel");
-	ratesList.put("INR", "Indisk Rupie");
-	ratesList.put("JPY", "Japansk Yen");
-	ratesList.put("KRW", "Sydkoreansk Won");
-	ratesList.put("MXN", "Mexikansk Peso");
-	ratesList.put("MYR", "Malayisk Ringgit");
-	ratesList.put("NOK", "Norsk Krona");
-	ratesList.put("NZD", "Nyzeeländsk Dollar");
-	ratesList.put("PHP", "Filippinsk Peso");
-	ratesList.put("PLN", "Polsk Zloty");
-	ratesList.put("RON", "Rumänsk Leu");
-	ratesList.put("RUB", "Rysk Rubel");
-	ratesList.put("SEK", "Svensk Krona");
-	ratesList.put("SGD", "Singapore-dollar");
-	ratesList.put("THB", "Thailändsk Baht");
-	ratesList.put("TRY", "Ny Turkisk Lira");
-	ratesList.put("USD", "US-dollar");
-	ratesList.put("ZAR", "Sydafrikansk Rand");
-	init = true;
+    
+    /**
+     * Get Currency object from Id
+     * @param fromId
+     * @return Currency object
+     * @throws EntityManagerException 
+     */
+    public Currency getCurrency(long fromId) throws EntityManagerException {
+	System.out.println("DEBIG: getCurrency: " + fromId);
+	return converterDAO.findCurrency(fromId);
+    }
+    
+    /**
+     * HashMap of available rates in API
+     * Swedish strings for use in 'longName' variable
+     */
+    private void initCurrencyList() {
+	currencyList.put("AUD", "Australinsk Dollar");
+	currencyList.put("BGN", "Bulgarisk Ny Lev");
+	currencyList.put("BRL", "Brasiliansk Real");
+	currencyList.put("CAD", "Kanadensisk Dollar");
+	currencyList.put("CHF", "Schweizisk Franc");
+	currencyList.put("CNY", "Kinesisk Yuan Renminbi");
+	currencyList.put("CZK", "Tjeckisk Koruna");
+	currencyList.put("DKK", "Dansk Krona");
+	currencyList.put("EUR", "Euro");
+	currencyList.put("GBP", "Brittisk Pund Sterling");
+	currencyList.put("HKD", "Hongkong-dollar");
+	currencyList.put("HRK", "Kroatisk Kuna");
+	currencyList.put("HUF", "Ungersk Forint");
+	currencyList.put("IDR", "Indonesisk Rupiah");
+	currencyList.put("ILS", "Israelisk Ny Shekel");
+	currencyList.put("INR", "Indisk Rupie");
+	currencyList.put("JPY", "Japansk Yen");
+	currencyList.put("KRW", "Sydkoreansk Won");
+	currencyList.put("MXN", "Mexikansk Peso");
+	currencyList.put("MYR", "Malayisk Ringgit");
+	currencyList.put("NOK", "Norsk Krona");
+	currencyList.put("NZD", "Nyzeeländsk Dollar");
+	currencyList.put("PHP", "Filippinsk Peso");
+	currencyList.put("PLN", "Polsk Zloty");
+	currencyList.put("RON", "Rumänsk Leu");
+	currencyList.put("RUB", "Rysk Rubel");
+	currencyList.put("SEK", "Svensk Krona");
+	currencyList.put("SGD", "Singapore-dollar");
+	currencyList.put("THB", "Thailändsk Baht");
+	currencyList.put("TRY", "Ny Turkisk Lira");
+	currencyList.put("USD", "US-dollar");
+	currencyList.put("ZAR", "Sydafrikansk Rand");
     }
 }

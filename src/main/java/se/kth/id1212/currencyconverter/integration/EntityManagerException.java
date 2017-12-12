@@ -7,7 +7,7 @@
 package se.kth.id1212.currencyconverter.integration;
 
 /**
- * An exception class 
+ * An exception class for Exceptions occurring in integration/ConverterDAO.java
  */
 public class EntityManagerException extends Exception {
 

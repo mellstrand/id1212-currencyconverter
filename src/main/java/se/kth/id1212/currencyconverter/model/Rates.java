@@ -16,10 +16,6 @@ import javax.persistence.NamedQuery;
 
 @NamedQueries({
     @NamedQuery(
-        name = "getConversionRate",
-        query = "SELECT rate FROM Rates rate WHERE rate.baseCurrency=:baseCurrency AND rate.toCurrency=:toCurrency"
-    ),
-    @NamedQuery(
 	name = "getRelatedCurrencies",
 	query = "SELECT rate FROM Rates rate WHERE rate.baseCurrency=:baseCurrency"
     ),
@@ -32,6 +28,7 @@ import javax.persistence.NamedQuery;
 /**
  * Entity class for Rates
  * Holds information about rates from a currency to another
+ * Along with Getters and Setters and relations in database
  */
 
 @Entity(name = "Rates")

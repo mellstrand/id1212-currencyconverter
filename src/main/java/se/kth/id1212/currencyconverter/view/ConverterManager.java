@@ -1,53 +1,61 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ *
+ * @author mellstrand
+ * @date 2017-12-06
  */
 package se.kth.id1212.currencyconverter.view;
 
 import java.io.Serializable;
 import java.util.List;
 import javax.ejb.EJB;
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
 import se.kth.id1212.currencyconverter.controller.FacadeController;
 import se.kth.id1212.currencyconverter.integration.EntityManagerException;
 import se.kth.id1212.currencyconverter.model.Currency;
-import se.kth.id1212.currencyconverter.model.Rates;
 
 /**
- *
- * @author mellstrand
- * @date 2017-12-06
+ * Bean for the "normal" users interactions to the web page
  */
-
 @Named("converterManager")
-@RequestScoped
+@SessionScoped
 public class ConverterManager implements Serializable {
     
-    @EJB
-    private FacadeController facadeController;
-    
+    @EJB private FacadeController facadeController;
     private Exception exception;
     private double amount = 0;
     private double convertedAmount = 0;
     private long fromId;
     private long toId;
-    
    
+    /**
+     * Print and set an exception 
+     */
     private void handleException(Exception e) {
 	e.printStackTrace(System.err);
 	exception = e;
     }
     
+    /**
+     * Enables 'errorConverter.xhtml' to retrieve exception for display 
+     * @return 
+     */
     public Exception getException() {
         return exception;
     }
     
+    /**
+     * For 'faces-config.xml' to see if any exceptions has occurred 
+     * @return 
+     */
     public boolean getSuccess() {
 	return exception == null;
     }
     
+    /**
+     * To display all currencies in a list for the user 
+     * @return 
+     */
     public List<Currency> getAllCurrencies() {
         exception = null;
         try {
@@ -58,17 +66,23 @@ public class ConverterManager implements Serializable {
         }
     }
     
-    public List<Rates> getRelatedCurrencies() {
-        exception = null;
-        try {
-	    Currency fromCurrency = facadeController.getCurrency(fromId);
-            return facadeController.getRelatedCurrencies(fromCurrency);
-        } catch (Exception e) {
-            handleException(e);
-            return null;
-        }
+    /**
+     * Update Conversion Rates button
+     * Calls controller for fetching new rates
+     */
+    public void updateRates() {
+	exception = null;
+	try {
+	    facadeController.updateRates();
+	} catch (Exception e) {
+	    handleException(e);
+	}
     }
     
+    /**
+     * Convert button
+     * Calls controller to convert currency
+     */
     public void convertCurrency() {
 	exception = null;
 	try {

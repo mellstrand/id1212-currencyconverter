@@ -32,7 +32,7 @@ and open the template in the editor.
                                itemLabel="#{currency}"
                                itemValue="#{currency.id}" />    
             </h:selectOneMenu>
-         
+            
             <h3>Amount:</h3>
             <h:inputText value="#{converterManager.amount}" required="true"></h:inputText>
             <h:commandButton value="Convert" action="#{converterManager.convertCurrency}" />
@@ -43,12 +43,16 @@ and open the template in the editor.
         </h:form>
         
         <h:form>
-            <h1>Update Currency Rates</h1>
-            <h:commandButton value="Update Rates" action="#{currencyManager.updateRates}" />
+            <h1>Update Currency Conversion Rates</h1>
+            <h:commandButton value="Update Conversion Rates" action="#{converterManager.updateRates}" />
         </h:form>
         
+        <br/>
+        
+        <h1>Dev Section</h1>
+        
         <h:form>
-            <h1>Add Currency To Database</h1>
+            <h2>Add Currency To Database</h2>
             <h:outputLabel for="short" value="ShortName (ex: eur, usd, sek...):" />
             <h:inputText id="short" value="#{currencyManager.shortName}" />
             <br/>
@@ -56,7 +60,7 @@ and open the template in the editor.
         </h:form>
         
         <h:form>
-            <h1>Add Rate binding To Database</h1>
+            <h2>Add Rate binding To Database</h2>
             <h:outputLabel value="Base currency" />
             <h:selectOneMenu value="${currencyManager.fromId}">
                 <f:selectItems value="${converterManager.allCurrencies}"
