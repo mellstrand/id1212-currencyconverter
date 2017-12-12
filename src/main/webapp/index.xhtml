@@ -14,27 +14,64 @@ and open the template in the editor.
     <h:body>
         <h1>Currency Converter</h1>
         
-        <h2>From:</h2>
-        <h:selectOneMenu>
-            <f:selectItems value="#{converterManager.allCurrencies}"
-                           itemLabel="#{currency.shortName}" />   
-        </h:selectOneMenu>
-        
-        <h2>To:</h2>
-        <h:selectOneMenu>
-            
-            
-        </h:selectOneMenu>
-        
-        <h2>Amount:</h2>
-        <h:inputText></h:inputText>
-        <h:commandButton value="Convert" action="#{converterManager.convert()}"/>
-        
-        
-        
-        <h2>Update Currency Rates</h2>
         <h:form>
-            <h:commandButton value="Update Rates" action="#{converterManager.updateRates()}"/>
+            <h3>From:</h3>
+            <h:selectOneMenu value="${converterManager.fromId}">
+                <f:selectItem itemLabel="Select currency to convert from" itemValue="" /> 
+                <f:selectItems value="${converterManager.allCurrencies}"
+                               var="currency"
+                               itemLabel="#{currency}"
+                               itemValue="#{currency.id}" />   
+            </h:selectOneMenu>
+        
+            <h3>To:</h3>
+            <h:selectOneMenu value="#{converterManager.toId}">
+                <f:selectItem itemLabel="Select currency to convert into" itemValue="" />
+                <f:selectItems value="${converterManager.allCurrencies}"
+                               var="currency"
+                               itemLabel="#{currency}"
+                               itemValue="#{currency.id}" />    
+            </h:selectOneMenu>
+         
+            <h3>Amount:</h3>
+            <h:inputText value="#{converterManager.amount}" required="true"></h:inputText>
+            <h:commandButton value="Convert" action="#{converterManager.convertCurrency}" />
+            <br/>
+            <h:outputLabel id="convert" value="Converted to: " />
+            <h:inputText value="#{converterManager.convertedAmount}" readonly="true"></h:inputText>
+            
+        </h:form>
+        
+        <h:form>
+            <h1>Update Currency Rates</h1>
+            <h:commandButton value="Update Rates" action="#{currencyManager.updateRates}" />
+        </h:form>
+        
+        <h:form>
+            <h1>Add Currency To Database</h1>
+            <h:outputLabel for="short" value="ShortName (ex: eur, usd, sek):" />
+            <h:inputText id="short" value="#{currencyManager.shortName}" />
+            <br/>
+            <h:commandButton value="Add Currency" action="#{currencyManager.addCurrency}" />
+        </h:form>
+        
+        <h:form>
+            <h1>Add Rate binding To Database</h1>
+            <h:outputLabel value="Base currency" />
+            <h:selectOneMenu value="${currencyManager.fromId}">
+                <f:selectItems value="${converterManager.allCurrencies}"
+                           var="currency"
+                           itemValue="#{currency.id}"
+                           itemLabel="#{currency}" />   
+            </h:selectOneMenu><br/>
+            <h:outputLabel value="To currency:" />
+            <h:selectOneMenu value="${currencyManager.toId}">
+                <f:selectItems value="${converterManager.allCurrencies}"
+                           var="currency"
+                           itemValue="#{currency.id}"
+                           itemLabel="#{currency}" />   
+            </h:selectOneMenu><br/>
+            <h:commandButton value="Add Rate binding" action="#{currencyManager.addRatesBinding}"/>
         </h:form>
     
     </h:body>

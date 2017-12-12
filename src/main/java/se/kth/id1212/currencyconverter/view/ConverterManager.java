@@ -7,16 +7,16 @@ package se.kth.id1212.currencyconverter.view;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import se.kth.id1212.currencyconverter.controller.FacadeController;
 import se.kth.id1212.currencyconverter.integration.EntityManagerException;
 import se.kth.id1212.currencyconverter.model.Currency;
+import se.kth.id1212.currencyconverter.model.Rates;
 
 /**
  *
@@ -24,34 +24,20 @@ import se.kth.id1212.currencyconverter.model.Currency;
  */
 
 @Named("converterManager")
-@ConversationScoped
+@RequestScoped
 public class ConverterManager implements Serializable {
     
     @EJB
     private FacadeController facadeController;
-    @Inject
-    private Conversation conversation;
     
     private Exception exception;
-    private double amount;
-    private double convertedAmount;
+    private double amount = 0;
+    private double convertedAmount = 0;
     private long fromId;
     private long toId;
     
-    private void startConversation() {
-        if(conversation.isTransient()) {
-            conversation.begin();
-        }
-    }
-    
-    private void stopConversation() {
-        if(!conversation.isTransient()) {
-            conversation.end();
-        }
-    }
-    
+   
     private void handleException(Exception e) {
-	stopConversation();
 	e.printStackTrace(System.err);
 	exception = e;
     }
@@ -74,21 +60,23 @@ public class ConverterManager implements Serializable {
         }
     }
     
+    public List<Rates> getRelatedCurrencies() {
+        exception = null;
+        try {
+	    Currency fromCurrency = facadeController.getCurrency(fromId);
+            return facadeController.getRelatedCurrencies(fromCurrency);
+        } catch (Exception e) {
+            handleException(e);
+            return null;
+        }
+    }
+    
     public void convertCurrency() {
 	exception = null;
 	try {
 	    convertedAmount = facadeController.convert(fromId, toId, amount);
 	} catch (EntityManagerException ex) {
 	    handleException(ex);
-	}
-    }
-    
-    public void updateRates() {
-	exception = null;
-	try {
-	    facadeController.updateRates();
-	} catch (Exception e) {
-	    handleException(e);
 	}
     }
     
@@ -108,19 +96,19 @@ public class ConverterManager implements Serializable {
 	return convertedAmount;
     }
     
-    public void setFromCurrency(long id) {
-	fromId = id;
+    public void setFromId(long fromId) {
+	this.fromId = fromId;
     }
     
-    public long getFromCurrency(long id) {
+    public long getFromId() {
 	return fromId;
     }
     
-    public void setToCurrency(long id) {
-	toId = id;
+    public void setToId(long toId) {
+	this.toId = toId;
     }
     
-    public long getToCurrency() {
+    public long getToId() {
 	return toId;
     }
             

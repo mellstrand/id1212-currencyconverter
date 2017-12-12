@@ -5,7 +5,6 @@
  */
 package se.kth.id1212.currencyconverter.model;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -15,7 +14,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -31,10 +31,10 @@ public class JSONHandler {
 	 
     }
     
-    public void getCurrencyUpdate(String currency) throws MalformedURLException, IOException {
+    public Set<Map.Entry<String, JsonElement>> getCurrencyUpdate(String base) throws MalformedURLException, IOException {
 	
 	URL url;
-	String u = urlBase.concat(currency);
+	String u = urlBase.concat(base);
 	url = new URL(u);
 	
 	HttpURLConnection request = (HttpURLConnection) url.openConnection();
@@ -42,22 +42,11 @@ public class JSONHandler {
 	
 	JsonParser jp = new JsonParser();
 	JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent()));
-	JsonObject rootObj = root.getAsJsonObject();
+	JsonObject rootObject = root.getAsJsonObject();
+	JsonElement rates = rootObject.get("rates");
+	JsonObject ratesObject = rates.getAsJsonObject();
 	
-	JsonElement rates = rootObj.get("rates");
-	JsonObject ratesObj = rates.getAsJsonObject();
-	
-	JsonElement aud = ratesObj.get("AUD");
-	double AUDrate = aud.getAsDouble();
-	
-	JsonArray msg = rates.getAsJsonArray();
-            Iterator<JsonElement> iterator = msg.iterator();
-	    int i = 0;
-            while (iterator.hasNext()) {
-                System.out.println("Rates: " + i + " - " + iterator.next());
-		i++;
-	    }
-	
+	return ratesObject.entrySet();
     }
    
     
