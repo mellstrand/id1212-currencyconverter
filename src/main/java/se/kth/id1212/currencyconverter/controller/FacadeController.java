@@ -24,6 +24,7 @@ import se.kth.id1212.currencyconverter.model.Rates;
 /**
  *
  * @author mellstrand
+ * @date 2017-12-06
  */
 
 @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)

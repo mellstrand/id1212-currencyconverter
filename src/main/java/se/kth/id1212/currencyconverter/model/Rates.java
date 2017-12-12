@@ -1,8 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ *
+ * @author mellstrand
+ * @date 2017-12-06
  */
+
 package se.kth.id1212.currencyconverter.model;
 
 import java.io.Serializable;
@@ -12,11 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-
-/**
- *
- * @author mellstrand
- */
 
 @NamedQueries({
     @NamedQuery(
@@ -32,6 +28,11 @@ import javax.persistence.NamedQuery;
 	query = "SELECT rate FROM Rates rate WHERE rate.baseCurrency=:baseCurrency AND rate.toCurrency=:toCurrency"
     )
 })
+
+/**
+ * Entity class for Rates
+ * Holds information about rates from a currency to another
+ */
 
 @Entity(name = "Rates")
 public class Rates implements Serializable {

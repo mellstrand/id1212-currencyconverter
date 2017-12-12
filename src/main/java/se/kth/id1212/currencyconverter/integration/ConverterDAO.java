@@ -1,8 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ *
+ * @author mellstrand
+ * @date 2017-12-06
  */
+
 package se.kth.id1212.currencyconverter.integration;
 
 import java.util.List;
@@ -16,8 +17,7 @@ import se.kth.id1212.currencyconverter.model.Currency;
 import se.kth.id1212.currencyconverter.model.Rates;
 
 /**
- *
- * @author mellstrand
+ * ConverterDAO handles database communication
  */
 
 @TransactionAttribute(TransactionAttributeType.MANDATORY)
@@ -27,6 +27,12 @@ public class ConverterDAO {
     @PersistenceContext(unitName = "CurrencyConverterPU")
     private EntityManager entityManager;
     
+    /**
+     * Find currency in database
+     * @param id Id for the currency in the database
+     * @return Searched currency
+     * @throws EntityManagerException If currency could not be found
+     */
     public Currency findCurrency(long id) throws EntityManagerException {
         try {
             return entityManager.find(Currency.class, id);
@@ -38,7 +44,7 @@ public class ConverterDAO {
     /**
      * For listing of currencies for the client to choose from
      * @return Returns a list with all currencies in the database
-     * @throws EntityManagerException  
+     * @throws EntityManagerException
      */
     public List<Currency> getAllCurrencies() throws EntityManagerException {
         try {
@@ -48,6 +54,12 @@ public class ConverterDAO {
         }
     }
     
+    /**
+     * Get currencies that are connected in the database to the 'from' currency
+     * @param baseCurrency The currency the user wants to convert from
+     * @return List of Rates object <base,to,rate>
+     * @throws EntityManagerException 
+     */
     public List<Rates> getRelatedCurrencies(Currency baseCurrency) throws EntityManagerException {
 	try {
 	    return entityManager.createNamedQuery("getRelatedCurrencies", Rates.class)
@@ -57,6 +69,13 @@ public class ConverterDAO {
 	}
     }
     
+    /**
+     * Get searched currency pair to be able to get the conversion rate
+     * @param baseCurrency Currency to convert from
+     * @param toCurrency Currency to convert to
+     * @return Rates object
+     * @throws EntityManagerException 
+     */
     public Rates getConversionRate(Currency baseCurrency, Currency toCurrency) throws EntityManagerException {
         try {
             return entityManager.createNamedQuery("getConversionRate", Rates.class)
@@ -68,6 +87,12 @@ public class ConverterDAO {
         }
     }
     
+    /**
+     * Check in a currency exists in the database's Currency table
+     * @param currency Searched currency
+     * @return A Currency object if it exists
+     * @throws EntityManagerException 
+     */
     private Currency currencyExists(Currency currency) throws EntityManagerException {
 	String shortName = currency.getShortName();
 	try {
@@ -78,6 +103,11 @@ public class ConverterDAO {
 	}
     }
 
+    /**
+     * Add currency object to the database Currency table
+     * @param currency Currency to store
+     * @throws EntityManagerException 
+     */
     public void addCurrencyToDataBase(Currency currency) throws EntityManagerException {
 	if(currencyExists(currency) != null) {
 	    throw new EntityManagerException("Could not create: " + currency + ". Already in database.");
@@ -90,6 +120,13 @@ public class ConverterDAO {
 	}
     }
     
+    /**
+     * Check if a rate connection are existing
+     * @param baseCurrency From currency
+     * @param toCurrency To currency
+     * @return Rates object for searched currencies
+     * @throws EntityManagerException 
+     */
     private Rates ratesExists(Currency baseCurrency, Currency toCurrency) throws EntityManagerException {
 	try {
 	    return entityManager.createNamedQuery("ratesExists", Rates.class)
@@ -100,6 +137,14 @@ public class ConverterDAO {
 	}
     }
 
+    /**
+     * Update the rate between two currencies. If none in table, create the Rates object
+     * Else update the rate for the searched currencies
+     * @param baseCurrency From currency
+     * @param toCurrency To currency
+     * @param value Conversion rate
+     * @throws EntityManagerException 
+     */
     public void updateConversionRate(Currency baseCurrency, Currency toCurrency, double value) throws EntityManagerException {
 	Rates rate = ratesExists(baseCurrency, toCurrency);
 	if(rate == null) {
@@ -121,10 +166,19 @@ public class ConverterDAO {
 	
     }
 
-    public void addRatesBindingToDataBase(Currency baseCurrency, Currency toCurrency) {
-	entityManager.persist(new Rates(baseCurrency, toCurrency));
-	System.out.println("DEBUG: addRatesBindingToDatabase(): " + baseCurrency + toCurrency);
+    /**
+     * Add a initial connection between two currencies, so that a rate can be fetched for these
+     * @param baseCurrency From currency
+     * @param toCurrency To currency
+     * @throws EntityManagerException
+     */
+    public void addRatesBindingToDataBase(Currency baseCurrency, Currency toCurrency) throws EntityManagerException {
+	try {
+	    entityManager.persist(new Rates(baseCurrency, toCurrency));
+	    System.out.println("DEBUG: addRatesBindingToDatabase(): " + baseCurrency + toCurrency);
+	} catch(Exception e) {
+	    throw new EntityManagerException("Could not create Rates object");
+	}
     }
-    
     
 }

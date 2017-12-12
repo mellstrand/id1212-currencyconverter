@@ -8,10 +8,7 @@ package se.kth.id1212.currencyconverter.view;
 import java.io.Serializable;
 import java.util.List;
 import javax.ejb.EJB;
-import javax.enterprise.context.Conversation;
-import javax.enterprise.context.ConversationScoped;
 import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
 import javax.inject.Named;
 import se.kth.id1212.currencyconverter.controller.FacadeController;
 import se.kth.id1212.currencyconverter.integration.EntityManagerException;
@@ -21,6 +18,7 @@ import se.kth.id1212.currencyconverter.model.Rates;
 /**
  *
  * @author mellstrand
+ * @date 2017-12-06
  */
 
 @Named("converterManager")

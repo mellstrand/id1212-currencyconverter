@@ -14,6 +14,7 @@ import se.kth.id1212.currencyconverter.controller.FacadeController;
 /**
  *
  * @author mellstrand
+ * @date 2017-12-08
  */
 @Named("currencyManager")
 @RequestScoped
@@ -25,15 +26,7 @@ public class CurrencyManager implements Serializable {
     private long fromId;
     private long toId;
     private Exception exception;
-    /*
-    public DevAdminController getDevAdminController() {
-	return dac;
-    }
     
-    public void setDevAdminController(DevAdminController dac) {
-	this.dac = dac;
-    }
-    */
     public String getShortName() {
 	return shortName;
     }

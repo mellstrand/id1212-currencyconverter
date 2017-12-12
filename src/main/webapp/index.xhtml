@@ -9,7 +9,7 @@ and open the template in the editor.
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
-        <title>Currency Converter</title>
+        <title>CurrencyConverter</title>
     </h:head>
     <h:body>
         <h1>Currency Converter</h1>
@@ -49,7 +49,7 @@ and open the template in the editor.
         
         <h:form>
             <h1>Add Currency To Database</h1>
-            <h:outputLabel for="short" value="ShortName (ex: eur, usd, sek):" />
+            <h:outputLabel for="short" value="ShortName (ex: eur, usd, sek...):" />
             <h:inputText id="short" value="#{currencyManager.shortName}" />
             <br/>
             <h:commandButton value="Add Currency" action="#{currencyManager.addCurrency}" />

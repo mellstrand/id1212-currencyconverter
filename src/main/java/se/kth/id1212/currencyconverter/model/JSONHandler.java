@@ -1,8 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ *
+ * @author mellstrand
+ * @date 2017-12-08
  */
+
 package se.kth.id1212.currencyconverter.model;
 
 import com.google.gson.JsonElement;
@@ -18,8 +19,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
- * @author mellstrand
+ * JSON Handler for fetching current currency rates from an online API
+ * For more info...
+ * @url http://api.fixer.io
  */
 public class JSONHandler {
     
@@ -28,15 +30,20 @@ public class JSONHandler {
     public JSONHandler() {
 	
 	this.urlBase = "http://api.fixer.io/latest?base=";
-	 
     }
-    
+    /**
+     * 
+     * @param base The base currency for which to get conversion rates to
+     *	      Currency on a 3 letter form, e.g. USD, SEK, EUR.
+     * @return Rates for the requested base,  Entry example: "EUR": 0.84774
+     * @throws MalformedURLException Requested URL not valid
+     * @throws IOException Could not open connection to requested URL
+     */
     public Set<Map.Entry<String, JsonElement>> getCurrencyUpdate(String base) throws MalformedURLException, IOException {
 	
 	URL url;
 	String u = urlBase.concat(base);
 	url = new URL(u);
-	
 	HttpURLConnection request = (HttpURLConnection) url.openConnection();
 	request.connect();
 	
@@ -48,6 +55,5 @@ public class JSONHandler {
 	
 	return ratesObject.entrySet();
     }
-   
     
 }

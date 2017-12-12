@@ -13,7 +13,7 @@ and open the template in the editor.
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     </h:head>
     <h:body>
-        <h1>Something failed</h1>
+        <h1>Something failed with Converter Manager</h1>
         <c:choose>
             <c:when test="#{converterManager.exception.cause != null}">
                 <h3><h:outputText value="#{converterManager.exception.cause.message}"/></h3>

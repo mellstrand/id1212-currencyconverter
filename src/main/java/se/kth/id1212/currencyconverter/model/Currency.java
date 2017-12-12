@@ -1,8 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ *
+ * @author mellstrand
+ * @date 2017-12-06
  */
+
 package se.kth.id1212.currencyconverter.model;
 
 import java.io.Serializable;
@@ -13,11 +14,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-
-/**
- *
- * @author mellstrand
- */
 
 @NamedQueries({
     @NamedQuery(
@@ -31,7 +27,11 @@ import javax.persistence.NamedQuery;
     )
 })
 
-
+/**
+ * Entity class for Currency
+ * Holds two string, a short and a long representation of a currency
+ * Example: USD - US-dollar
+ */
 @Entity(name = "Currency")
 public class Currency implements Serializable {
 
